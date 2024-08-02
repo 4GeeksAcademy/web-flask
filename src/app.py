@@ -1,4 +1,21 @@
-from utils import db_connect
-engine = db_connect()
+from flask import Flask, request, render_template
+import pandas as pd
 
-# your code here
+app = Flask(__name__)
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/data', methods=['POST'])
+def data():
+    if request.method == 'POST':
+        file = request.files['file']
+        if file:
+            df = pd.read_csv(file)
+            data_html = df.to_html()
+            return render_template('index.html', data=data_html)
+    return render_template('index.html')
+
+if __name__ == '__main__':
+    app.run(debug=True)
