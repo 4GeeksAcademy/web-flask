@@ -1,21 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Model Prediction</title>
-</head>
-<body>
-    <h1>Upload CSV for Prediction</h1>
-    <form action="/predict" method="post" enctype="multipart/form-data">
-        <input type="file" name="file">
-        <input type="submit" value="Upload">
-    </form>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Movie Recommendation</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Movie Recommendation System</h1>
+      <form id="recommendation-form">
+        <label for="user-input">Enter Movie Preferences:</label>
+        <input type="text" id="user-input" name="user-input" />
+        <button type="submit">Get Recommendation</button>
+      </form>
+      <div id="recommendation-result"></div>
+    </div>
 
-    {% if data %}
-        <h2>Predictions</h2>
-        {{ data | safe }}
-    {% endif %}
-</body>
+    <script>
+      document
+        .getElementById("recommendation-form")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
+          let userInput = document.getElementById("user-input").value;
+
+          fetch("/recommend", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ input: userInput }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              document.getElementById(
+                "recommendation-result"
+              ).innerText = `Recommended Movie: ${data.recommendation}`;
+            })
+            .catch((error) => console.error("Error:", error));
+        });
+    </script>
+  </body>
 </html>
-

@@ -1,34 +1,25 @@
-from flask import Flask,request,render_template,url_for
-import numpy as np
-from sklearn.preprocessing import StandardScaler
-import joblib as joblib
-import os
+from flask import Flask, request, jsonify, render_template
+import joblib
+import pandas as pd
 
-model=joblib.load('model.pkl')
-scaler=joblib.load('model.sav')
+app = Flask(__name__)
 
-app =Flask(__name__)
+# Cargar el modelo
+model = joblib.load('src/model.pkl')  # o 'src/model.sav'
 
-
-
+# Ruta principal
 @app.route('/')
-def index():
+def home():
     return render_template('index.html')
 
-@app.route('/',methods=['GET','POST'])
-def home():
-    if request.method =='POST':
-        sl=request.form['cons.price.idx']
-        sw = request.form['euribor3m']
-        pl = request.form['pdays']
-        pw = request.form['age']
-        data = np.array([[sl, sw, pl, pw]])
-        x = scaler.transform(data)
-        print(x)
-        prediction = model.predict(x)
-        print(prediction)
-    return render_template('index.html',prediction=prediction[0])
-
+# Ruta para obtener recomendaciones
+@app.route('/recommend', methods=['POST'])
+def recommend():
+    user_input = request.json['input']
+    # Preprocesar el input si es necesario
+    # Obtener la recomendación del modelo
+    recommendation = model.predict([user_input])
+    return jsonify({'recommendation': recommendation.tolist()})
 
 if __name__ == '__main__':
     app.run(debug=True)
