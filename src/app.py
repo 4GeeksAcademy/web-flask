@@ -1,30 +1,42 @@
 from flask import Flask, request, jsonify
-import joblib
 import pandas as pd
-from sklearn.feature_extraction.text import TfidfVectorizer
+import joblib
 
 app = Flask(__name__)
 
-# Cargar el modelo y los datos
+# Cargar el modelo y la base de datos
 model = joblib.load('src/models/model.pkl')
 total_data = pd.read_csv('src/data/peliculas.csv')
-tfidf_vectorizer = TfidfVectorizer()
-tfidf_matrix = tfidf_vectorizer.fit_transform(total_data["tags"])
 
-@app.route('/recommend', methods=['POST'])
-def recommend():
-    movie = request.form.get('movie')
-    if not movie:
-        return jsonify({"error": "No se ha proporcionado el título de la película."}), 400
+def recommend(movie):
+    if movie not in total_data["title"].values:
+        return "Movie not found in the dataset."
+    
+    movie_index = total_data[total_data["title"] == movie].index[0]
+    distances, indices = model.kneighbors(tfidf_matrix[movie_index])
+    
+    similar_movies = []
+    for i in range(1, len(distances[0])):
+        similar_movies.append((total_data["title"].iloc[indices[0][i]], distances[0][i]))
+    
+    if not similar_movies:
+        return "No similar movies found."
+    
+    return similar_movies
 
-    try:
-        movie_index = total_data[total_data["title"] == movie].index[0]
-        distances, indices = model.kneighbors(tfidf_matrix[movie_index])
-        similar_movies = [(total_data["title"][i], distances[0][j]) for j, i in enumerate(indices[0])]
-        recommendations = similar_movies[1:]
-        return jsonify({"recommendations": recommendations})
-    except IndexError:
-        return jsonify({"error": "Película no encontrada."}), 404
+@app.route('/recommend', methods=['GET'])
+def recommend_movies():
+    movie_title = request.args.get('title')
+    
+    if not movie_title:
+        return jsonify({"error": "No movie title provided"}), 400
+    
+    recommendations = recommend(movie_title)
+    
+    if isinstance(recommendations, str):  # Handle error messages
+        return jsonify({"error": recommendations}), 404
+    
+    return jsonify({"recommendations": recommendations})
 
 if __name__ == '__main__':
     app.run(debug=True)
