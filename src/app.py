@@ -4,7 +4,8 @@ import joblib
 app = Flask(__name__)
 
 # Cargar el modelo KNN
-model = joblib.load('C:\Users\Fukushima\Documents\GitHub\web-flask\src\models\model.pkl')
+model = joblib.load('C:/Users/Fukushima/Documents/GitHub/web-flask/src/models/model.pkl')
+
 
 @app.route('/')
 def home():
@@ -13,7 +14,7 @@ def home():
 @app.route('/recommend', methods=['POST'])
 def recommend():
     data = request.json['input']
-    # Procesar la entrada y obtener la recomendación
+    
     recommendation = model.predict([data])[0]
     return jsonify({'recommendation': recommendation})
 
