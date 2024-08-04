@@ -4,7 +4,8 @@ import joblib
 app = Flask(__name__)
 
 # Cargar el modelo KNN
-model = joblib.load('C:/Users/Fukushima/Documents/GitHub/web-flask/src/models/model.pkl')
+model = joblib.load('src/models/model.pkl')
+
 
 
 @app.route('/')
