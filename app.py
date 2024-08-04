@@ -9,12 +9,7 @@ app = Flask(__name__)
 try:
     model = joblib.load('src/models/model.pkl')
     total_data = pd.read_csv('src/data/peliculas.csv')
-
-    # Recalcular la matriz TF-IDF
-    tfidf_vectorizer = TfidfVectorizer()
-    tfidf_matrix = tfidf_vectorizer.fit_transform(total_data["tags"])
-except Exception as e:
-    print(f"Error loading model or data: {e}")
+    tfidf_vectorizer = joblib.load('src/models/tfidf_vectorizer.pkl')
 
 # Ruta para la página principal
 @app.route('/')
