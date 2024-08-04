@@ -1,109 +1,43 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Recomendaciones de Películas</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 20px;
-        background-color: #f4f4f4;
-      }
-      h1 {
-        text-align: center;
-      }
-      #container {
-        max-width: 600px;
-        margin: auto;
-        background: #fff;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      }
-      input[type="text"] {
-        width: calc(100% - 22px);
-        padding: 10px;
-        margin-bottom: 10px;
-      }
-      button {
-        padding: 10px;
-        background-color: #007bff;
-        border: none;
-        color: white;
-        cursor: pointer;
-        border-radius: 4px;
-        width: 100%;
-      }
-      button:hover {
-        background-color: #0056b3;
-      }
-      #results {
-        margin-top: 20px;
-      }
-      .result-item {
-        padding: 10px;
-        border-bottom: 1px solid #ddd;
-      }
-      .error {
-        color: red;
-      }
-    </style>
+    <title>Movie Recommendations</title>
   </head>
   <body>
-    <div id="container">
-      <h1>Recomendador de Películas</h1>
-      <input
-        type="text"
-        id="movie-title"
-        placeholder="Introduce el título de la película"
-      />
-      <button onclick="getRecommendations()">Obtener Recomendaciones</button>
-      <div id="results"></div>
-    </div>
+    <h1>Movie Recommendations</h1>
+    <form id="movieForm">
+      <input type="text" id="movieTitle" placeholder="Enter movie title" />
+      <button type="submit">Get Recommendations</button>
+    </form>
+    <div id="recommendations"></div>
 
     <script>
-      async function getRecommendations() {
-        const title = document.getElementById("movie-title").value;
-        const resultsDiv = document.getElementById("results");
-        resultsDiv.innerHTML = "";
+      document
+        .getElementById("movieForm")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
+          const title = document.getElementById("movieTitle").value;
 
-        if (!title) {
-          resultsDiv.innerHTML =
-            '<p class="error">Por favor, introduce un título de película.</p>';
-          return;
-        }
-
-        try {
-          const response = await fetch(
-            `/recommend?title=${encodeURIComponent(title)}`
-          );
-          const data = await response.json();
-
-          if (response.ok) {
-            const recommendations = data.recommendations;
-            if (recommendations.length === 0) {
-              resultsDiv.innerHTML =
-                "<p>No se encontraron recomendaciones.</p>";
-            } else {
-              recommendations.forEach(([movie, distance]) => {
-                const div = document.createElement("div");
-                div.classList.add("result-item");
-                div.textContent = `Película: ${movie}, Distancia: ${distance.toFixed(
-                  2
-                )}`;
-                resultsDiv.appendChild(div);
-              });
-            }
-          } else {
-            resultsDiv.innerHTML = `<p class="error">${data.error}</p>`;
-          }
-        } catch (error) {
-          resultsDiv.innerHTML =
-            '<p class="error">Hubo un error al obtener las recomendaciones.</p>';
-        }
-      }
+          fetch(`/recommend?title=${title}`)
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.error) {
+                document.getElementById("recommendations").innerText =
+                  data.error;
+              } else {
+                const recommendations = data.recommendations
+                  .map((movie) => movie[0])
+                  .join("<br>");
+                document.getElementById(
+                  "recommendations"
+                ).innerHTML = `Recommended Movies:<br>${recommendations}`;
+              }
+            })
+            .catch((error) => {
+              document.getElementById("recommendations").innerText =
+                "An error occurred.";
+            });
+        });
     </script>
   </body>
 </html>

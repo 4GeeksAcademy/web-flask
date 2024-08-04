@@ -7,8 +7,8 @@ app = Flask(__name__)
 
 # Cargar el modelo y los datos
 try:
-    model = joblib.load('src/models/model.pkl')
-    total_data = pd.read_csv('src/data/peliculas.csv')
+    model = joblib.load('.../src/models/model.pkl')
+    total_data = pd.read_csv('.../src/data/peliculas.csv')
 
     # Recalcular la matriz TF-IDF
     tfidf_vectorizer = TfidfVectorizer()
