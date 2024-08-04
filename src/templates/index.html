@@ -1,47 +1,59 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Movie Recommendation</title>
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='style.css') }}"
-    />
+    <title>Recomendador de Películas</title>
   </head>
   <body>
-    <div class="container">
-      <h1>Movie Recommendation System</h1>
-      <form id="recommendation-form">
-        <label for="user-input">Enter Movie Preferences:</label>
-        <input type="text" id="user-input" name="user-input" />
-        <button type="submit">Get Recommendation</button>
-      </form>
-      <div id="recommendation-result"></div>
-    </div>
-
+    <h1>Recomendador de Películas</h1>
+    <form id="movieForm">
+      <label for="movieTitle">Título de la película:</label>
+      <input type="text" id="movieTitle" name="movieTitle" required />
+      <button type="submit">Obtener Recomendaciones</button>
+    </form>
+    <ul id="recommendationsList"></ul>
     <script>
-      document
-        .getElementById("recommendation-form")
-        .addEventListener("submit", function (event) {
+      document.addEventListener("DOMContentLoaded", function () {
+        const form = document.getElementById("movieForm");
+        form.addEventListener("submit", function (event) {
           event.preventDefault();
-          let userInput = document.getElementById("user-input").value;
-
+          const movieTitle = document.getElementById("movieTitle").value;
           fetch("/recommend", {
             method: "POST",
             headers: {
-              "Content-Type": "application/json",
+              "Content-Type": "application/x-www-form-urlencoded",
             },
-            body: JSON.stringify({ input: userInput }),
+            body: new URLSearchParams({
+              movie: movieTitle,
+            }),
           })
             .then((response) => response.json())
             .then((data) => {
-              document.getElementById(
-                "recommendation-result"
-              ).innerText = `Recommended Movie: ${data.recommendation}`;
+              // Maneja la respuesta aquí (muestra las recomendaciones en la página)
+              console.log(data);
+              const recommendationsList = document.getElementById(
+                "recommendationsList"
+              );
+              recommendationsList.innerHTML = "";
+              if (data.recommendations) {
+                data.recommendations.forEach(([movie, distance]) => {
+                  const listItem = document.createElement("li");
+                  listItem.textContent = `${movie} (Distancia: ${distance.toFixed(
+                    2
+                  )})`;
+                  recommendationsList.appendChild(listItem);
+                });
+              } else {
+                const errorItem = document.createElement("li");
+                errorItem.textContent = data.error;
+                recommendationsList.appendChild(errorItem);
+              }
             })
-            .catch((error) => console.error("Error:", error));
+            .catch((error) => {
+              console.error("Error:", error);
+            });
         });
+      });
     </script>
   </body>
 </html>
