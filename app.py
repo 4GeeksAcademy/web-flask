@@ -62,14 +62,18 @@ def recommend():
         return jsonify({"error": "Modelo o vectorizador no disponibles"}), 500
 
     try:
+        print(f"Recibiendo solicitud de recomendación para el título: {title}")
         # Convertir el título a una representación TF-IDF
         title_vector = vectorizer.transform([title])
+        print(f"Vector del título: {title_vector}")
         # Obtener recomendaciones
         recommendations = model.predict(title_vector)
+        print(f"Recomendaciones obtenidas: {recommendations}")
         return jsonify({"recommendations": recommendations.tolist()})
     except Exception as e:
         print(f"Error al procesar la recomendación: {e}")
         return jsonify({"error": "Error al procesar la recomendación"}), 500
+
 
 if __name__ == "__main__":
     app.run(debug=True)
