@@ -15,33 +15,34 @@ def load_model():
     try:
         with open(MODEL_PATH, 'rb') as f:
             model = pickle.load(f)
+        print("Modelo cargado exitosamente.")
     except FileNotFoundError as e:
         print(f"Error: {e}")
         model = None
     except Exception as e:
         print(f"Error al cargar el modelo: {e}")
         model = None
-    finally:
-        return model
+    return model
 
 def load_vectorizer():
     try:
         vectorizer = joblib.load(VECTORIZER_PATH)
+        print("Vectorizador cargado exitosamente.")
     except FileNotFoundError as e:
         print(f"Error: {e}")
         vectorizer = None
     except Exception as e:
         print(f"Error al cargar el vectorizador: {e}")
         vectorizer = None
-    finally:
-        return vectorizer
+    return vectorizer
 
-# Cargar el modelo y el vectorizador al iniciar la aplicación
+# Cargar el modelo, el vectorizador y los datos al iniciar la aplicación
 model = load_model()
 vectorizer = load_vectorizer()
 data = None
 try:
     data = pd.read_csv(DATA_PATH)
+    print("Datos cargados exitosamente.")
 except FileNotFoundError as e:
     print(f"Error: {e}")
 except Exception as e:
