@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <title>Recomendaciones de Películas</title>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Bienvenido a la aplicación de recomendaciones de películas</h1>
+      <form action="/recommend" method="get">
+        <div class="form-group">
+          <label for="title">Título de la película</label>
+          <input
+            type="text"
+            class="form-control"
+            id="title"
+            name="title"
+            required
+          />
+        </div>
+        <button type="submit" class="btn btn-primary">
+          Obtener Recomendaciones
+        </button>
+      </form>
+      {% if recommendations %}
+      <h2>Recomendaciones:</h2>
+      <ul>
+        {% for recommendation in recommendations %}
+        <li>{{ recommendation }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </div>
+  </body>
+</html>
